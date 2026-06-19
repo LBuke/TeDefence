@@ -55,14 +55,14 @@ draw_grid :: proc() {
         top: raylib.Vector2 = { f32(x), 0 }
         bottom: raylib.Vector2 = { f32(x), f32(screenHeight) }
 
-        raylib.DrawLineEx(top, bottom, 1, {255, 255, 255, 255})
+        raylib.DrawLineEx(top, bottom, 1, raylib.WHITE)
     }
 
     for y: i32 = 0; y < screenHeight; y += GRID_SIZE {
         left: raylib.Vector2 = { 0, f32(y) }
         right: raylib.Vector2 = { f32(screenWidth), f32(y) }
 
-        raylib.DrawLineEx(left, right, 1, {255, 255, 255, 255})
+        raylib.DrawLineEx(left, right, 1, raylib.WHITE)
     }
 }
 
