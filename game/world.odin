@@ -1,13 +1,12 @@
 package game
 
 import raylib "vendor:raylib"
+import tiles "tile"
 
-GRID_SIZE: i32 = 32
+GRID_SIZE: i32 = 16
 GRID_COLS: i32
 GRID_ROWS: i32
 GRID: []Cell
-
-FLOOR: raylib.Texture2D
 
 Cell :: struct {
     x, y: i32,
@@ -16,8 +15,7 @@ Cell :: struct {
 
 SetupWorld :: proc() {
     setup_grid()
-
-    FLOOR = raylib.LoadTexture("game/assets/Walls_street.png")
+    tiles.LoadTextures()
 }
 
 DrawWorld :: proc() {
@@ -79,10 +77,5 @@ highlight_grid :: proc() {
 
 @(private)
 draw_terrain :: proc() {
-    rectangle := raylib.Rectangle { 48*4, 48*5, 48, 48 }
-    scale := raylib.Rectangle{ 0, 0, 48*4, 48*4 }
-    raylib.DrawTexturePro(FLOOR, rectangle, scale, {0, 0}, 0, raylib.WHITE)
-
-    scale2 := raylib.Rectangle{ 48*4, 0, 48*4, 48*4 }
-    raylib.DrawTexturePro(FLOOR, rectangle, scale2, {0, 0}, 0, raylib.WHITE)
+    tiles.RenderTile(tiles.SAND_BRICKS, {0, 0})
 }
