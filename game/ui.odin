@@ -19,6 +19,10 @@ DrawUI :: proc() {
             raylib.SetWindowState({.VSYNC_HINT})
         }
     }
+
+    if button(screenWidth-86, 60, 86, 50, "Regen") {
+        GenerateTerrain()
+    }
 }
 
 @(private)
