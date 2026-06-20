@@ -16,33 +16,35 @@ Tile :: struct {
 	swimmable: bool,
 }
 
-TEXTURE_1: raylib.Texture
+SIZE_16: raylib.Texture
+SIZE_32: raylib.Texture
 
 LoadTextures :: proc() {
-	TEXTURE_1 = raylib.LoadTexture("game/assets/Walls_street.png")
+	SIZE_16 = raylib.LoadTexture("game/assets/16.png")
+	SIZE_32 = raylib.LoadTexture("game/assets/32.png")
 }
 
-SAND_BRICKS: Tile = {
-	id = "sand_bricks",
+GRASS: Tile = {
+	id = "grass",
 	type = TileType.GROUND,
-	texture = &TEXTURE_1,
-	src = { 48*4, 48*5, 48, 48 },
-	scale = 4,
+	texture = &SIZE_32,
+	src = { x = 0, y = 0, width = 32, height = 32 },
+	scale = 1,
 	walkable = true,
 	swimmable = false
 }
 
-SAND_BRICKS_2: Tile = {
-	id = "sand_bricks",
+DIRT: Tile = {
+	id = "dirt",
 	type = TileType.GROUND,
-	texture = &TEXTURE_1,
-	src = { 48*3, 48*5, 48, 48 },
-	scale = 4,
+	texture = &SIZE_32,
+	src = { x = 32, y = 0, width = 32, height = 32 },
+	scale = 1,
 	walkable = true,
 	swimmable = false
 }
 
-RenderTile :: proc(tile: Tile, pos: raylib.Vector2) {
-	dest := raylib.Rectangle { pos.x, pos.y, tile.src.width * tile.scale, tile.src.height * tile.scale }
+DrawTile :: proc(tile: Tile, pos: raylib.Vector2) {
+	dest := raylib.Rectangle { pos.x * tile.scale, pos.y * tile.scale, tile.src.width * tile.scale, tile.src.height * tile.scale }
 	raylib.DrawTexturePro(tile.texture^, tile.src, dest, {0, 0}, 0, raylib.WHITE)
 }

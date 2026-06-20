@@ -77,6 +77,7 @@ highlight_grid :: proc() {
 
 @(private)
 draw_terrain :: proc() {
-    tiles.RenderTile(tiles.SAND_BRICKS, {0, 0})
-    tiles.RenderTile(tiles.SAND_BRICKS_2, {48*4, 0})
+    tiles.DrawTile(tiles.GRASS, {0, 0})
+    tiles.DrawTile(tiles.DIRT, {32, 0})
+    tiles.DrawTile(tiles.DIRT, {64, 0})
 }
