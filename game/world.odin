@@ -1,21 +1,33 @@
 package game
 
 import raylib "vendor:raylib"
+import rand "core:math/rand"
 import tiles "tile"
-
-GRID_SIZE: i32 = 16
-GRID_COLS: i32
-GRID_ROWS: i32
-GRID: []Cell
 
 Cell :: struct {
     x, y: i32,
     index: i32
 }
 
+Terrain :: struct {
+    x, y: i32,
+    tile: tiles.Tile
+}
+
+GRID_SIZE: i32 = 16
+GRID_COLS: i32
+GRID_ROWS: i32
+GRID: []Cell
+
+TERRAIN_GRID_SIZE: i32 = 32
+TERRAIN_GRID_COLS: i32
+TERRAIN_GRID_ROWS: i32
+TERRAIN: []Terrain
+
 SetupWorld :: proc() {
     setup_grid()
     tiles.LoadTextures()
+    GenerateTerrain()
 }
 
 DrawWorld :: proc() {
@@ -38,7 +50,7 @@ setup_grid :: proc() {
     index: i32 = 0
     for x: i32 = 0; x < GRID_COLS; x += 1 {
         for y: i32 = 0; y < GRID_ROWS; y += 1 {
-            GRID[x * GRID_ROWS + y] = Cell{x = x, y = y, index = index}
+            GRID[x * GRID_ROWS + y] = Cell{ x = x, y = y, index = index }
             index += 1
         }
     }
@@ -75,9 +87,40 @@ highlight_grid :: proc() {
     }
 }
 
+GenerateTerrain :: proc() {
+    if TERRAIN != nil {
+        delete(TERRAIN)
+    }
+
+    screenWidth: i32 = raylib.GetScreenWidth()
+    screenHeight: i32 = raylib.GetScreenHeight()
+
+    TERRAIN_GRID_COLS = screenWidth / TERRAIN_GRID_SIZE
+    TERRAIN_GRID_ROWS = screenHeight / TERRAIN_GRID_SIZE
+    TERRAIN = make([]Terrain, int(TERRAIN_GRID_COLS * TERRAIN_GRID_ROWS))
+
+    for x: i32 = 0; x < TERRAIN_GRID_COLS; x += 1 {
+        for y: i32 = 0; y < TERRAIN_GRID_ROWS; y += 1 {
+            tile: tiles.Tile = tiles.DIRT
+            if rand.float32() < 0.7 {
+                tile = tiles.WATER
+            }
+            if rand.float32() < 0.2 {
+                tile = tiles.GRASS
+            }
+
+            TERRAIN[x * TERRAIN_GRID_ROWS + y] = Terrain{
+                x = x * TERRAIN_GRID_SIZE,
+                y = y * TERRAIN_GRID_SIZE,
+                tile = tile
+            }
+        }
+    }
+}
+
 @(private)
 draw_terrain :: proc() {
-    tiles.DrawTile(tiles.GRASS, {0, 0})
-    tiles.DrawTile(tiles.DIRT, {32, 0})
-    tiles.DrawTile(tiles.DIRT, {64, 0})
+    for tile in TERRAIN {
+        tiles.DrawTile(tile.tile, {f32(tile.x), f32(tile.y)})
+    }
 }
