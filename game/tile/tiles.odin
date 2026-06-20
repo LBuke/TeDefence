@@ -44,6 +44,16 @@ DIRT: Tile = {
 	swimmable = false
 }
 
+WATER: Tile = {
+	id = "water",
+	type = TileType.GROUND,
+	texture = &SIZE_32,
+	src = { x = 32<<1, y = 0, width = 32, height = 32 },
+	scale = 1,
+	walkable = false,
+	swimmable = true
+}
+
 DrawTile :: proc(tile: Tile, pos: raylib.Vector2) {
 	dest := raylib.Rectangle { pos.x * tile.scale, pos.y * tile.scale, tile.src.width * tile.scale, tile.src.height * tile.scale }
 	raylib.DrawTexturePro(tile.texture^, tile.src, dest, {0, 0}, 0, raylib.WHITE)
