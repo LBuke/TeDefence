@@ -11,7 +11,8 @@ Cell :: struct {
 
 Terrain :: struct {
     x, y: i32,
-    tile: tiles.Tile
+    tile: tiles.Tile,
+    biome: Biome
 }
 
 GRID_SIZE: i32 = 16
@@ -24,6 +25,10 @@ TERRAIN_GRID_COLS: i32
 TERRAIN_GRID_ROWS: i32
 TERRAIN: []Terrain
 
+// Noise settings used to generate the terrain. The offset is re-randomised on
+// every GenerateTerrain call so the "Regen" button pans to a fresh region.
+WORLD_NOISE: NoiseState = DEFAULT_NOISE
+
 SetupWorld :: proc() {
     setup_grid()
     tiles.LoadTextures()
@@ -32,6 +37,7 @@ SetupWorld :: proc() {
 
 DrawWorld :: proc() {
     draw_terrain()
+    draw_biome_overlay()
 
     if VERBOSE_WORLD {
         draw_grid()
@@ -99,20 +105,20 @@ GenerateTerrain :: proc() {
     TERRAIN_GRID_ROWS = screenHeight / TERRAIN_GRID_SIZE
     TERRAIN = make([]Terrain, int(TERRAIN_GRID_COLS * TERRAIN_GRID_ROWS))
 
+    // Pan to a new vantage point in the noise field so each regen is unique.
+    WORLD_NOISE.offset = { rand.float64() * 4096, rand.float64() * 4096 }
+
     for x: i32 = 0; x < TERRAIN_GRID_COLS; x += 1 {
         for y: i32 = 0; y < TERRAIN_GRID_ROWS; y += 1 {
-            tile: tiles.Tile = tiles.DIRT
-            if rand.float32() < 0.7 {
-                tile = tiles.WATER
-            }
-            if rand.float32() < 0.2 {
-                tile = tiles.GRASS
-            }
+            // Sample in grid-cell space so terrain features stay a consistent
+            // size regardless of window resolution.
+            biome := sample(x, y, WORLD_NOISE)
 
             TERRAIN[x * TERRAIN_GRID_ROWS + y] = Terrain{
                 x = x * TERRAIN_GRID_SIZE,
                 y = y * TERRAIN_GRID_SIZE,
-                tile = tile
+                tile = biome_to_tile(biome),
+                biome = biome
             }
         }
     }
@@ -122,5 +128,16 @@ GenerateTerrain :: proc() {
 draw_terrain :: proc() {
     for tile in TERRAIN {
         tiles.DrawTile(tile.tile, {f32(tile.x), f32(tile.y)})
+    }
+}
+
+// Debug view: tint each terrain cell with its true biome colour, so the full
+// biome classification is visible even though only 3 tiles get drawn.
+@(private)
+draw_biome_overlay :: proc() {
+    for cell in TERRAIN {
+        color := BIOME_COLORS[cell.biome]
+        color.a = 150
+        raylib.DrawRectangle(cell.x, cell.y, TERRAIN_GRID_SIZE, TERRAIN_GRID_SIZE, color)
     }
 }
